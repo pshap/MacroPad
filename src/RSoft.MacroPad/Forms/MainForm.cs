@@ -45,20 +45,35 @@ namespace RSoft.MacroPad.Forms
         #region Init
         private void InitializeUsb()
         {
-            var config = _configReader.Read("config.txt");
-            if (config != null)
-                _usb.SupportedDevices = config.SupportedDevices;
-
+            try
+            {
+                var config = _configReader.Read("config.txt");
+                if (config != null)
+                    _usb.SupportedDevices = config.SupportedDevices;
+            }
+            catch (Exception ex)
+            {   
+                // Log the exception, show an error message, or handle the error in some other way
+                Console.WriteLine(ex);
+            }
+            
             _usb.OnConnected += (s, e) =>
             {
-                var layout = _layouts.FirstOrDefault(l => l.Products.Any(p => p.VendorId == _usb.VendorId && p.ProductId == _usb.ProductId));
+                try{
+                    var layout = _layouts.FirstOrDefault(l => l.Products.Any(p => p.VendorId == _usb.VendorId && p.ProductId == _usb.ProductId));
 
-                if (layout != null)
-                {
-                    keyboardVisual1.KeyboardLayout = layout;
-                    keyboardFunction1.KeyboardLayout = layout;
+                    if (layout != null)
+                    {
+                        keyboardVisual1.KeyboardLayout = layout;
+                        keyboardFunction1.KeyboardLayout = layout;
+                    }
                 }
-
+                catch (Exception ex)
+                {
+                    // Log the exception, show an error message, or handle the error in some other way
+                    Console.WriteLine(ex);
+                }
+                
                 lblCommStatus.Text = $"Connected: ({_usb.VendorId}:{_usb.ProductId}) Protocol: {_usb.ProtocolType}.id{_usb.Version}";
 
                 ShowDisclaimerIfNeeded();
